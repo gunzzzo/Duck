@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>!Dirty Duck Clicker!</title>
+    <title>🦆 Dirty Duck Clicker</title>
     <style>
         * {
             margin: 0;
@@ -12,24 +12,42 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
         }
 
         .container {
             display: flex;
             gap: 40px;
-            max-width: 1200px;
-            width: 90%;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 1400px;
+            width: 95%;
+            background: rgba(255, 255, 255, 0.97);
+            border-radius: 30px;
+            padding: 50px;
+            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 1;
         }
 
         .main-clicker {
@@ -38,183 +56,321 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 30px;
+            gap: 35px;
         }
 
         h1 {
-            color: #333;
-            font-size: 2.5em;
+            color: #2d3748;
+            font-size: 3em;
             text-align: center;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 10px rgba(102, 126, 234, 0.1);
+            letter-spacing: -1px;
         }
 
         .duck-counter {
-            font-size: 2em;
-            color: #764ba2;
-            font-weight: bold;
+            font-size: 2.2em;
+            color: #2d3748;
+            font-weight: 700;
             text-align: center;
+            letter-spacing: -0.5px;
         }
 
         .duck-counter .number {
             color: #667eea;
-            font-size: 1.2em;
+            font-size: 1.3em;
+            font-weight: 900;
+            display: block;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
         .duck-button {
-            width: 250px;
-            height: 250px;
+            width: 280px;
+            height: 280px;
             border-radius: 50%;
             border: none;
-            background: linear-gradient(145deg, #FFB347, #FFA500);
+            background: linear-gradient(145deg, #FFD700, #FFA500);
             cursor: pointer;
-            font-size: 3em;
+            font-size: 4em;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.1s ease;
-            box-shadow: 0 10px 30px rgba(255, 165, 0, 0.4);
+            transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 
+                0 20px 60px rgba(255, 165, 0, 0.4),
+                inset 0 -5px 20px rgba(0, 0, 0, 0.1),
+                inset 0 5px 20px rgba(255, 255, 255, 0.4);
             position: relative;
             overflow: hidden;
+            filter: drop-shadow(0 5px 15px rgba(255, 165, 0, 0.2));
+        }
+
+        .duck-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), transparent);
+            border-radius: 50%;
         }
 
         .duck-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 15px 40px rgba(255, 165, 0, 0.6);
+            transform: scale(1.1) translateY(-3px);
+            box-shadow: 
+                0 30px 80px rgba(255, 165, 0, 0.6),
+                inset 0 -5px 20px rgba(0, 0, 0, 0.1),
+                inset 0 5px 20px rgba(255, 255, 255, 0.5);
         }
 
         .duck-button:active {
-            transform: scale(0.95);
-            box-shadow: 0 5px 15px rgba(255, 165, 0, 0.3);
+            transform: scale(0.95) translateY(2px);
+            box-shadow: 
+                0 10px 30px rgba(255, 165, 0, 0.3),
+                inset 0 -3px 10px rgba(0, 0, 0, 0.15),
+                inset 0 3px 10px rgba(255, 255, 255, 0.3);
         }
 
         .floatie {
             position: absolute;
-            font-size: 1.5em;
-            font-weight: bold;
+            font-size: 2em;
+            font-weight: 900;
             pointer-events: none;
-            animation: float-up 1s ease-out forwards;
+            animation: float-up 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         @keyframes float-up {
             0% {
                 opacity: 1;
-                transform: translateY(0) scale(1);
+                transform: translateY(0) translateX(-20px) scale(1);
             }
             100% {
                 opacity: 0;
-                transform: translateY(-80px) scale(0.5);
+                transform: translateY(-120px) translateX(20px) scale(0.3) rotate(360deg);
             }
         }
 
         .stats {
             text-align: center;
-            color: #666;
-            font-size: 0.95em;
+            color: #4a5568;
+            font-size: 1.05em;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            padding: 20px 30px;
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
         }
 
         .stats div {
-            margin: 5px 0;
+            margin: 8px 0;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .stats span {
+            color: #667eea;
+            font-weight: 800;
         }
 
         .sidebar {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 25px;
         }
 
         h2 {
-            color: #333;
-            font-size: 1.5em;
-            margin-bottom: 10px;
+            color: #2d3748;
+            font-size: 1.7em;
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .section {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
         }
 
         .upgrades, .buildings {
             flex: 1;
             overflow-y: auto;
-            padding-right: 10px;
+            padding-right: 12px;
+            scroll-behavior: smooth;
         }
 
         .upgrades::-webkit-scrollbar,
         .buildings::-webkit-scrollbar {
-            width: 8px;
+            width: 10px;
         }
 
         .upgrades::-webkit-scrollbar-track,
         .buildings::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
             border-radius: 10px;
         }
 
         .upgrades::-webkit-scrollbar-thumb,
         .buildings::-webkit-scrollbar-thumb {
-            background: #667eea;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
             border-radius: 10px;
-        }
-
-        .upgrade-item, .building-item {
-            background: linear-gradient(135deg, #f5f5f5 0%, #efefef 100%);
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 10px;
-            cursor: pointer;
             transition: all 0.3s ease;
         }
 
+        .upgrades::-webkit-scrollbar-thumb:hover,
+        .buildings::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #764ba2 0%, #667eea 100%);
+        }
+
+        .upgrade-item, .building-item {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border: 2px solid #cbd5e0;
+            border-radius: 12px;
+            padding: 16px 18px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upgrade-item::before, .building-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .upgrade-item:hover::before, .building-item:hover::before {
+            left: 100%;
+        }
+
         .upgrade-item:hover, .building-item:hover {
-            transform: translateX(5px);
-            background: linear-gradient(135deg, #efefef 0%, #e5e5e5 100%);
+            transform: translateX(8px) translateY(-2px);
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
             border-color: #667eea;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
         }
 
         .upgrade-item.disabled, .building-item.disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
         }
 
         .upgrade-item.disabled:hover, .building-item.disabled:hover {
             transform: none;
-            background: linear-gradient(135deg, #f5f5f5 0%, #efefef 100%);
-            border-color: #ddd;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-color: #cbd5e0;
+            box-shadow: none;
         }
 
         .item-name {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 6px;
+            font-size: 1.05em;
+            letter-spacing: -0.3px;
         }
 
         .item-cost {
-            font-size: 0.85em;
-            color: #666;
+            font-size: 0.9em;
+            color: #718096;
+            margin-top: 6px;
+            font-weight: 600;
         }
 
         .item-effect {
-            font-size: 0.85em;
-            color: #764ba2;
-            font-weight: bold;
+            font-size: 0.95em;
+            color: #667eea;
+            font-weight: 700;
+            background: rgba(102, 126, 234, 0.1);
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        .upgrade-item.applied {
+            background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+            border-color: #68d391;
+        }
+
+        .upgrade-item.applied .item-name::after {
+            content: ' ✓';
+            color: #22543d;
         }
 
         .reset-button {
             background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
+            padding: 14px 28px;
+            border-radius: 12px;
             cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
+            font-weight: 700;
+            font-size: 1.05em;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
             margin-top: auto;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+            letter-spacing: 0.5px;
         }
 
         .reset-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+            transform: scale(1.08) translateY(-2px);
+            box-shadow: 0 15px 40px rgba(255, 107, 107, 0.5);
         }
 
-        @media (max-width: 1024px) {
+        .reset-button:active {
+            transform: scale(0.95);
+        }
+
+        .achievement-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #2d3748;
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+            animation: slideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 100;
+        }
+
+        @keyframes slideIn {
+            0% {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 1200px) {
             .container {
                 flex-direction: column;
+                padding: 40px;
+                gap: 30px;
             }
 
             .main-clicker, .sidebar {
@@ -222,9 +378,42 @@
             }
 
             .duck-button {
+                width: 240px;
+                height: 240px;
+                font-size: 3.5em;
+            }
+
+            h1 {
+                font-size: 2.5em;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px;
+                gap: 20px;
+            }
+
+            .duck-button {
                 width: 200px;
                 height: 200px;
-                font-size: 2.5em;
+                font-size: 3em;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .duck-counter {
+                font-size: 1.8em;
+            }
+
+            .sidebar {
+                gap: 15px;
+            }
+
+            h2 {
+                font-size: 1.4em;
             }
         }
     </style>
@@ -234,27 +423,28 @@
         <div class="main-clicker">
             <h1>🦆 Dirty Duck Clicker 🦆</h1>
             <div class="duck-counter">
-                Ducks: <span class="number" id="duckCount">0</span>
+                Ducks Collected
+                <span class="number" id="duckCount">0</span>
             </div>
             <button class="duck-button" id="duckButton">🦆</button>
             <div class="stats">
-                <div>Per Click: <span id="clickValue">1</span></div>
-                <div>Per Second: <span id="perSecond">0</span></div>
+                <div>💥 Per Click: <span id="clickValue">1</span></div>
+                <div>⚡ Per Second: <span id="perSecond">0</span></div>
             </div>
         </div>
 
         <div class="sidebar">
-            <div>
+            <div class="section">
                 <h2>🏗️ Buildings</h2>
                 <div class="buildings" id="buildingsContainer"></div>
             </div>
 
-            <div>
+            <div class="section">
                 <h2>⭐ Upgrades</h2>
                 <div class="upgrades" id="upgradesContainer"></div>
             </div>
 
-            <button class="reset-button" id="resetButton">Reset Game</button>
+            <button class="reset-button" id="resetButton">🔄 Reset Game</button>
         </div>
     </div>
 
@@ -313,12 +503,13 @@
         function createFloatie(amount) {
             const floatie = document.createElement('div');
             floatie.className = 'floatie';
-            floatie.textContent = '+' + amount;
+            floatie.textContent = '+' + Math.floor(amount);
             floatie.style.color = '#667eea';
             floatie.style.left = Math.random() * 100 + '%';
+            floatie.style.top = Math.random() * 50 + '%';
             elements.duckButton.appendChild(floatie);
             
-            setTimeout(() => floatie.remove(), 1000);
+            setTimeout(() => floatie.remove(), 1200);
         }
 
         function generatePerSecond() {
@@ -338,6 +529,7 @@
                 renderBuildings();
                 updateDisplay();
                 saveGame();
+                showAchievement(`${building.name} purchased!`);
             }
         }
 
@@ -360,6 +552,7 @@
                 renderUpgrades();
                 updateDisplay();
                 saveGame();
+                showAchievement(`${upgrade.name} unlocked!`);
             }
         }
 
@@ -379,7 +572,7 @@
                     <div class="building-item ${!canAfford ? 'disabled' : ''}" onclick="buyBuilding('${building.id}')">
                         <div class="item-name">${building.name}</div>
                         <div class="item-effect">+${building.duckPerSecond.toFixed(1)}/sec</div>
-                        <div class="item-cost">Cost: ${cost} | Owned: ${building.amount}</div>
+                        <div class="item-cost">Cost: ${cost.toLocaleString()} | Owned: ${building.amount}</div>
                     </div>
                 `;
             }).join('');
@@ -389,21 +582,33 @@
             elements.upgradesContainer.innerHTML = gameState.upgrades.map(upgrade => {
                 const canAfford = gameState.ducks >= upgrade.cost && !upgrade.applied;
                 return `
-                    <div class="upgrade-item ${!canAfford ? 'disabled' : ''}" onclick="buyUpgrade('${upgrade.id}')">
-                        <div class="item-name">${upgrade.name} ${upgrade.applied ? '✓' : ''}</div>
+                    <div class="upgrade-item ${!canAfford ? 'disabled' : ''} ${upgrade.applied ? 'applied' : ''}" onclick="buyUpgrade('${upgrade.id}')">
+                        <div class="item-name">${upgrade.name}</div>
                         <div class="item-effect">${upgrade.effect}</div>
-                        <div class="item-cost">${upgrade.applied ? 'Purchased' : 'Cost: ' + upgrade.cost}</div>
+                        <div class="item-cost">${upgrade.applied ? '✓ Purchased' : 'Cost: ' + upgrade.cost.toLocaleString()}</div>
                     </div>
                 `;
             }).join('');
         }
 
         function updateDisplay() {
-            elements.duckCount.textContent = Math.floor(gameState.ducks);
+            elements.duckCount.textContent = Math.floor(gameState.ducks).toLocaleString();
             elements.clickValue.textContent = gameState.clickValue;
             elements.perSecond.textContent = gameState.perSecond.toFixed(1);
             renderBuildings();
             renderUpgrades();
+        }
+
+        function showAchievement(text) {
+            const badge = document.createElement('div');
+            badge.className = 'achievement-badge';
+            badge.textContent = text;
+            document.body.appendChild(badge);
+            
+            setTimeout(() => {
+                badge.style.animation = 'slideIn 0.5s ease-out reverse';
+                setTimeout(() => badge.remove(), 500);
+            }, 2500);
         }
 
         function saveGame() {
