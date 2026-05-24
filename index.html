@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>!Dirty Duck Clicker!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            gap: 40px;
+            max-width: 1200px;
+            width: 90%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .main-clicker {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5em;
+            text-align: center;
+        }
+
+        .duck-counter {
+            font-size: 2em;
+            color: #764ba2;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .duck-counter .number {
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        .duck-button {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(145deg, #FFB347, #FFA500);
+            cursor: pointer;
+            font-size: 3em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.1s ease;
+            box-shadow: 0 10px 30px rgba(255, 165, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .duck-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(255, 165, 0, 0.6);
+        }
+
+        .duck-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 5px 15px rgba(255, 165, 0, 0.3);
+        }
+
+        .floatie {
+            position: absolute;
+            font-size: 1.5em;
+            font-weight: bold;
+            pointer-events: none;
+            animation: float-up 1s ease-out forwards;
+        }
+
+        @keyframes float-up {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-80px) scale(0.5);
+            }
+        }
+
+        .stats {
+            text-align: center;
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .stats div {
+            margin: 5px 0;
+        }
+
+        .sidebar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        h2 {
+            color: #333;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .upgrades, .buildings {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .upgrades::-webkit-scrollbar,
+        .buildings::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .upgrades::-webkit-scrollbar-track,
+        .buildings::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .upgrades::-webkit-scrollbar-thumb,
+        .buildings::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .upgrade-item, .building-item {
+            background: linear-gradient(135deg, #f5f5f5 0%, #efefef 100%);
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upgrade-item:hover, .building-item:hover {
+            transform: translateX(5px);
+            background: linear-gradient(135deg, #efefef 0%, #e5e5e5 100%);
+            border-color: #667eea;
+        }
+
+        .upgrade-item.disabled, .building-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .upgrade-item.disabled:hover, .building-item.disabled:hover {
+            transform: none;
+            background: linear-gradient(135deg, #f5f5f5 0%, #efefef 100%);
+            border-color: #ddd;
+        }
+
+        .item-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .item-cost {
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .item-effect {
+            font-size: 0.85em;
+            color: #764ba2;
+            font-weight: bold;
+        }
+
+        .reset-button {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: auto;
+        }
+
+        .reset-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .main-clicker, .sidebar {
+                width: 100%;
+            }
+
+            .duck-button {
+                width: 200px;
+                height: 200px;
+                font-size: 2.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-clicker">
+            <h1>🦆 Dirty Duck Clicker 🦆</h1>
+            <div class="duck-counter">
+                Ducks: <span class="number" id="duckCount">0</span>
+            </div>
+            <button class="duck-button" id="duckButton">🦆</button>
+            <div class="stats">
+                <div>Per Click: <span id="clickValue">1</span></div>
+                <div>Per Second: <span id="perSecond">0</span></div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div>
+                <h2>🏗️ Buildings</h2>
+                <div class="buildings" id="buildingsContainer"></div>
+            </div>
+
+            <div>
+                <h2>⭐ Upgrades</h2>
+                <div class="upgrades" id="upgradesContainer"></div>
+            </div>
+
+            <button class="reset-button" id="resetButton">Reset Game</button>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        const gameState = {
+            ducks: 0,
+            clickValue: 1,
+            perSecond: 0,
+            buildings: [
+                { id: 'bill', name: '🦆 Bill Duck', baseCost: 10, amount: 0, duckPerSecond: 0.1 },
+                { id: 'family', name: '👨‍👩‍👧‍👦 Duck Family', baseCost: 100, amount: 0, duckPerSecond: 1 },
+                { id: 'farm', name: '🌾 Duck Farm', baseCost: 500, amount: 0, duckPerSecond: 5 },
+                { id: 'pond', name: '🏞️ Mud Pond', baseCost: 2000, amount: 0, duckPerSecond: 20 },
+                { id: 'factory', name: '🏭 Duck Factory', baseCost: 10000, amount: 0, duckPerSecond: 100 }
+            ],
+            upgrades: [
+                { id: 'better-click', name: '⚡ Stronger Click', cost: 50, effect: 'Double click value', applied: false, effect_fn: () => gameState.clickValue *= 2 },
+                { id: 'lucky-duck', name: '🍀 Lucky Duck', cost: 150, effect: '+0.2 ducks/sec', applied: false, effect_fn: () => gameState.perSecond += 0.2 },
+                { id: 'duckling-boost', name: '👶 Duckling Boost', cost: 300, effect: '+50% to buildings', applied: false, multiplier: 0.5 },
+                { id: 'mega-click', name: '💥 Mega Click', cost: 1000, effect: 'Triple click value', applied: false, effect_fn: () => gameState.clickValue *= 3 },
+                { id: 'golden-duck', name: '🏆 Golden Duck', cost: 5000, effect: 'All buildings +100%', applied: false, multiplier: 1 }
+            ]
+        };
+
+        const elements = {
+            duckCount: document.getElementById('duckCount'),
+            clickValue: document.getElementById('clickValue'),
+            perSecond: document.getElementById('perSecond'),
+            duckButton: document.getElementById('duckButton'),
+            buildingsContainer: document.getElementById('buildingsContainer'),
+            upgradesContainer: document.getElementById('upgradesContainer'),
+            resetButton: document.getElementById('resetButton')
+        };
+
+        // Initialize
+        function init() {
+            loadGame();
+            renderBuildings();
+            renderUpgrades();
+            updateDisplay();
+            
+            elements.duckButton.addEventListener('click', onDuckClick);
+            elements.resetButton.addEventListener('click', resetGame);
+            
+            setInterval(generatePerSecond, 1000);
+        }
+
+        function onDuckClick() {
+            gameState.ducks += gameState.clickValue;
+            createFloatie(gameState.clickValue);
+            updateDisplay();
+            saveGame();
+        }
+
+        function createFloatie(amount) {
+            const floatie = document.createElement('div');
+            floatie.className = 'floatie';
+            floatie.textContent = '+' + amount;
+            floatie.style.color = '#667eea';
+            floatie.style.left = Math.random() * 100 + '%';
+            elements.duckButton.appendChild(floatie);
+            
+            setTimeout(() => floatie.remove(), 1000);
+        }
+
+        function generatePerSecond() {
+            gameState.ducks += gameState.perSecond;
+            updateDisplay();
+            saveGame();
+        }
+
+        function buyBuilding(id) {
+            const building = gameState.buildings.find(b => b.id === id);
+            const cost = getBuildingCost(building);
+            
+            if (gameState.ducks >= cost) {
+                gameState.ducks -= cost;
+                building.amount++;
+                updatePerSecond();
+                renderBuildings();
+                updateDisplay();
+                saveGame();
+            }
+        }
+
+        function buyUpgrade(id) {
+            const upgrade = gameState.upgrades.find(u => u.id === id);
+            
+            if (!upgrade.applied && gameState.ducks >= upgrade.cost) {
+                gameState.ducks -= upgrade.cost;
+                upgrade.applied = true;
+                
+                if (upgrade.effect_fn) {
+                    upgrade.effect_fn();
+                }
+                
+                if (upgrade.multiplier !== undefined) {
+                    gameState.buildings.forEach(b => b.duckPerSecond *= (1 + upgrade.multiplier));
+                    updatePerSecond();
+                }
+                
+                renderUpgrades();
+                updateDisplay();
+                saveGame();
+            }
+        }
+
+        function getBuildingCost(building) {
+            return Math.floor(building.baseCost * Math.pow(1.15, building.amount));
+        }
+
+        function updatePerSecond() {
+            gameState.perSecond = gameState.buildings.reduce((sum, b) => sum + (b.amount * b.duckPerSecond), 0);
+        }
+
+        function renderBuildings() {
+            elements.buildingsContainer.innerHTML = gameState.buildings.map(building => {
+                const cost = getBuildingCost(building);
+                const canAfford = gameState.ducks >= cost;
+                return `
+                    <div class="building-item ${!canAfford ? 'disabled' : ''}" onclick="buyBuilding('${building.id}')">
+                        <div class="item-name">${building.name}</div>
+                        <div class="item-effect">+${building.duckPerSecond.toFixed(1)}/sec</div>
+                        <div class="item-cost">Cost: ${cost} | Owned: ${building.amount}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderUpgrades() {
+            elements.upgradesContainer.innerHTML = gameState.upgrades.map(upgrade => {
+                const canAfford = gameState.ducks >= upgrade.cost && !upgrade.applied;
+                return `
+                    <div class="upgrade-item ${!canAfford ? 'disabled' : ''}" onclick="buyUpgrade('${upgrade.id}')">
+                        <div class="item-name">${upgrade.name} ${upgrade.applied ? '✓' : ''}</div>
+                        <div class="item-effect">${upgrade.effect}</div>
+                        <div class="item-cost">${upgrade.applied ? 'Purchased' : 'Cost: ' + upgrade.cost}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateDisplay() {
+            elements.duckCount.textContent = Math.floor(gameState.ducks);
+            elements.clickValue.textContent = gameState.clickValue;
+            elements.perSecond.textContent = gameState.perSecond.toFixed(1);
+            renderBuildings();
+            renderUpgrades();
+        }
+
+        function saveGame() {
+            localStorage.setItem('dirtyDuckSave', JSON.stringify(gameState));
+        }
+
+        function loadGame() {
+            const saved = localStorage.getItem('dirtyDuckSave');
+            if (saved) {
+                const loaded = JSON.parse(saved);
+                Object.assign(gameState, loaded);
+                updatePerSecond();
+            }
+        }
+
+        function resetGame() {
+            if (confirm('Are you sure you want to reset your game? This cannot be undone!')) {
+                localStorage.removeItem('dirtyDuckSave');
+                location.reload();
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
