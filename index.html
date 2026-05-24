@@ -1,637 +1,1602 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🦆 Dirty Duck Clicker</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            max-width: 1800px;
-            width: 95%;
-            height: 95%;
-            background: rgba(255, 255, 255, 0.98);
-            border-radius: 40px;
-            padding: 60px;
-            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            position: relative;
-            z-index: 1;
-        }
-
-        .main-clicker {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 40px;
-            padding: 40px;
-            background: linear-gradient(135deg, #f8f9ff 0%, #f3f4ff 100%);
-            border-radius: 30px;
-            border: 2px solid #e2e8f0;
-        }
-
-        h1 {
-            color: #2d3748;
-            font-size: 3.5em;
-            text-align: center;
-            font-weight: 900;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -1.5px;
-            line-height: 1.2;
-        }
-
-        .subtitle {
-            color: #718096;
-            font-size: 1.1em;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-top: -20px;
-        }
-
-        .duck-counter-wrapper {
-            text-align: center;
-            background: rgba(102, 126, 234, 0.08);
-            padding: 25px 50px;
-            border-radius: 20px;
-            border: 2px solid rgba(102, 126, 234, 0.2);
-            width: 100%;
-        }
-
-        .duck-counter-label {
-            font-size: 1.1em;
-            color: #4a5568;
-            font-weight: 600;
-            margin-bottom: 10px;
-            letter-spacing: 0.5px;
-        }
-
-        .duck-counter .number {
-            color: #667eea;
-            font-size: 3em;
-            font-weight: 900;
-            display: block;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.08); }
-        }
-
-        .duck-button {
-            width: 350px;
-            height: 350px;
-            border-radius: 50%;
-            border: none;
-            background: linear-gradient(145deg, #FFD700, #FFA500);
-            cursor: pointer;
-            font-size: 5em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 
-                0 30px 80px rgba(255, 165, 0, 0.5),
-                inset 0 -8px 25px rgba(0, 0, 0, 0.15),
-                inset 0 8px 25px rgba(255, 255, 255, 0.5);
-            position: relative;
-            overflow: hidden;
-            filter: drop-shadow(0 8px 20px rgba(255, 165, 0, 0.3));
-        }
-
-        .duck-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), transparent 70%);
-            border-radius: 50%;
-        }
-
-        .duck-button:hover {
-            transform: scale(1.12) translateY(-5px);
-            box-shadow: 
-                0 40px 100px rgba(255, 165, 0, 0.7),
-                inset 0 -8px 25px rgba(0, 0, 0, 0.1),
-                inset 0 8px 25px rgba(255, 255, 255, 0.6);
-        }
-
-        .duck-button:active {
-            transform: scale(0.95) translateY(5px);
-            box-shadow: 
-                0 15px 40px rgba(255, 165, 0, 0.4),
-                inset 0 -4px 12px rgba(0, 0, 0, 0.2),
-                inset 0 4px 12px rgba(255, 255, 255, 0.3);
-        }
-
-        .floatie {
-            position: absolute;
-            font-size: 2.5em;
-            font-weight: 900;
-            pointer-events: none;
-            animation: float-up 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-            text-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        @keyframes float-up {
-            0% {
-                opacity: 1;
-                transform: translateY(0) translateX(-20px) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-150px) translateX(20px) scale(0.2) rotate(360deg);
-            }
-        }
-
-        .stats {
-            color: #2d3748;
-            font-size: 1.3em;
-            background: linear-gradient(135deg, #fff5e6 0%, #ffe8cc 100%);
-            padding: 25px 40px;
-            border-radius: 18px;
-            border: 2px solid #ffd700;
-            width: 100%;
-            display: flex;
-            justify-content: space-around;
-            gap: 30px;
-        }
-
-        .stat-item {
-            flex: 1;
-            text-align: center;
-            font-weight: 700;
-            letter-spacing: 0.3px;
-        }
-
-        .stats span {
-            color: #d97706;
-            font-weight: 900;
-            font-size: 1.4em;
-            display: block;
-            margin-top: 8px;
-        }
-
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-            height: 100%;
-        }
-
-        h2 {
-            color: #2d3748;
-            font-size: 1.8em;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
-
-        .section {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            min-height: 0;
-            background: linear-gradient(135deg, #f8f9ff 0%, #f3f4ff 100%);
-            border-radius: 25px;
-            padding: 25px;
-            border: 2px solid #e2e8f0;
-        }
-
-        .upgrades, .buildings {
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 15px;
-            scroll-behavior: smooth;
-        }
-
-        .upgrades::-webkit-scrollbar,
-        .buildings::-webkit-scrollbar {
-            width: 12px;
-        }
-
-        .upgrades::-webkit-scrollbar-track,
-        .buildings::-webkit-scrollbar-track {
-            background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
-            border-radius: 10px;
-        }
-
-        .upgrades::-webkit-scrollbar-thumb,
-        .buildings::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            min-height: 40px;
-        }
-
-        .upgrades::-webkit-scrollbar-thumb:hover,
-        .buildings::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, #764ba2 0%, #667eea 100%);
-        }
-
-        .upgrade-item, .building-item {
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 15px;
-            padding: 18px 20px;
-            margin-bottom: 14px;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .upgrade-item::before, .building-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            transition: left 0.6s ease;
-        }
-
-        .upgrade-item:hover::before, .building-item:hover::before {
-            left: 100%;
-        }
-
-        .upgrade-item:hover, .building-item:hover {
-            transform: translateX(10px) translateY(-3px);
-            background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
-            border-color: #667eea;
-            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.25);
-        }
-
-        .upgrade-item.disabled, .building-item.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            background: #f5f5f5;
-        }
-
-        .upgrade-item.disabled:hover, .building-item.disabled:hover {
-            transform: none;
-            background: #f5f5f5;
-            border-color: #e2e8f0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .item-name {
-            font-weight: 800;
-            color: #2d3748;
-            margin-bottom: 8px;
-            font-size: 1.1em;
-            letter-spacing: -0.3px;
-        }
-
-        .item-cost {
-            font-size: 0.95em;
-            color: #718096;
-            margin-top: 8px;
-            font-weight: 700;
-            letter-spacing: 0.2px;
-        }
-
-        .item-effect {
-            font-size: 1em;
-            color: #667eea;
-            font-weight: 800;
-            background: rgba(102, 126, 234, 0.12);
-            padding: 6px 12px;
-            border-radius: 8px;
-            display: inline-block;
-            margin-top: 6px;
-            letter-spacing: 0.2px;
-        }
-
-        .upgrade-item.applied {
-            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
-            border-color: #86efac;
-            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.2);
-        }
-
-        .upgrade-item.applied .item-name::after {
-            content: ' ✓';
-            color: #166534;
-        }
-
-        .reset-button {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
-            color: white;
-            border: none;
-            padding: 16px 32px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-weight: 800;
-            font-size: 1.2em;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 12px 40px rgba(255, 107, 107, 0.4);
-            letter-spacing: 0.5px;
-            margin-top: auto;
-        }
-
-        .reset-button:hover {
-            transform: scale(1.1) translateY(-3px);
-            box-shadow: 0 18px 50px rgba(255, 107, 107, 0.6);
-        }
-
-        .reset-button:active {
-            transform: scale(0.95);
-        }
-
-        .achievement-badge {
-            position: fixed;
-            top: 30px;
-            right: 30px;
-            background: linear-gradient(135deg, #ffd700, #ffed4e);
-            color: #2d3748;
-            padding: 18px 30px;
-            border-radius: 15px;
-            font-weight: 800;
-            font-size: 1.05em;
-            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.5);
-            animation: slideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            z-index: 100;
-            letter-spacing: 0.3px;
-        }
-
-        @keyframes slideIn {
-            0% {
-                transform: translateX(500px);
-                opacity: 0;
-            }
-            100% {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Duck Clicker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-alt: #020617;
+      --panel: #020617cc;
+      --accent: #facc15;
+      --accent-soft: #fef9c3;
+      --accent-2: #38bdf8;
+      --accent-3: #a855f7;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --danger: #f97373;
+      --success: #4ade80;
+    }
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #1d283a 0, #020617 55%, #000 100%);
+      color: var(--text);
+      overflow: hidden;
+    }
+    .app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 8px;
+      gap: 8px;
+    }
+    .top-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #0b1120, #020617);
+      box-shadow: 0 0 20px #000000aa;
+      font-size: 13px;
+    }
+    .top-resources {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #020617;
+      border: 1px solid #1f2937;
+      box-shadow: 0 0 10px #00000066;
+      white-space: nowrap;
+    }
+    .pill span.icon {
+      font-size: 16px;
+    }
+    .pill strong {
+      font-weight: 600;
+    }
+    .pill small {
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .top-right {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .btn {
+      border: none;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      background: #020617;
+      color: var(--text);
+      border: 1px solid #1f2937;
+      box-shadow: 0 0 10px #00000066;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 16px #000000aa;
+      background: #020617dd;
+    }
+    .btn:active {
+      transform: translateY(1px) scale(0.97);
+      box-shadow: 0 0 6px #000000aa;
+    }
+    .btn-primary {
+      background: radial-gradient(circle at top, #facc15, #eab308, #ca8a04);
+      color: #1f2937;
+      border-color: #facc15;
+      box-shadow: 0 0 18px #facc1588;
+    }
+    .btn-primary:hover {
+      background: radial-gradient(circle at top, #fef08a, #facc15, #eab308);
+    }
+    .btn-danger {
+      background: radial-gradient(circle at top, #fecaca, #f97373, #b91c1c);
+      color: #111827;
+      border-color: #fecaca;
+      box-shadow: 0 0 18px #fecaca88;
+    }
+    .btn-danger:hover {
+      background: radial-gradient(circle at top, #fee2e2, #fecaca, #f97373);
+    }
+    .layout {
+      flex: 1;
+      display: grid;
+      grid-template-columns: minmax(220px, 260px) minmax(0, 1.5fr) minmax(260px, 320px);
+      gap: 8px;
+      min-height: 0;
+    }
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto auto auto;
+      }
+    }
+    .panel {
+      background: radial-gradient(circle at top left, #020617, #020617ee);
+      border-radius: 18px;
+      padding: 10px;
+      border: 1px solid #1f2937;
+      box-shadow: 0 0 24px #000000aa;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .panel-header span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .panel-header strong {
+      color: var(--accent-soft);
+      font-weight: 600;
+    }
+    .panel-body {
+      flex: 1;
+      overflow: auto;
+      padding-right: 4px;
+      font-size: 13px;
+    }
+    .scroll {
+      scrollbar-width: thin;
+      scrollbar-color: #1f2937 #020617;
+    }
+    .scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .scroll::-webkit-scrollbar-track {
+      background: #020617;
+    }
+    .scroll::-webkit-scrollbar-thumb {
+      background: #1f2937;
+      border-radius: 999px;
+    }
+    .center-panel {
+      position: relative;
+      overflow: hidden;
+      align-items: center;
+      justify-content: center;
+    }
+    .center-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      align-items: center;
+      justify-items: center;
+      gap: 4px;
+    }
+    .duck-orbit {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .duck-orbit::before,
+    .duck-orbit::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      border: 1px dashed #38bdf833;
+      inset: 18%;
+      animation: orbit 18s linear infinite;
+    }
+    .duck-orbit::after {
+      inset: 28%;
+      border-style: solid;
+      border-color: #a855f733;
+      animation-duration: 26s;
+      animation-direction: reverse;
+    }
+    @keyframes orbit {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .duck-button {
+      position: relative;
+      width: min(260px, 60vw);
+      height: min(260px, 60vw);
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      background: radial-gradient(circle at 30% 20%, #fef9c3, #facc15, #eab308);
+      box-shadow:
+        0 0 0 4px #facc1533,
+        0 0 40px #facc1588,
+        0 18px 40px #000000aa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+      overflow: hidden;
+    }
+    .duck-button:hover {
+      transform: translateY(-4px) scale(1.03);
+      box-shadow:
+        0 0 0 4px #fef9c355,
+        0 0 60px #facc15aa,
+        0 22px 50px #000000dd;
+    }
+    .duck-button:active {
+      transform: translateY(2px) scale(0.97);
+      box-shadow:
+        0 0 0 3px #facc1544,
+        0 0 30px #facc1588,
+        0 10px 24px #000000aa;
+    }
+    .duck-face {
+      position: relative;
+      width: 70%;
+      height: 70%;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #fef9c3, #facc15, #eab308);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 -10px 20px #b45309aa;
+    }
+    .duck-eye {
+      position: absolute;
+      width: 16%;
+      height: 16%;
+      border-radius: 999px;
+      background: #0f172a;
+      top: 30%;
+      box-shadow: 0 0 0 3px #fef9c3;
+    }
+    .duck-eye.left { left: 26%; }
+    .duck-eye.right { right: 26%; }
+    .duck-eye::after {
+      content: "";
+      position: absolute;
+      width: 40%;
+      height: 40%;
+      border-radius: 999px;
+      background: #f9fafb;
+      top: 18%;
+      left: 18%;
+    }
+    .duck-beak {
+      position: absolute;
+      width: 50%;
+      height: 30%;
+      border-radius: 999px;
+      background: radial-gradient(circle at 50% 0, #fed7aa, #f97316, #c2410c);
+      bottom: 18%;
+      box-shadow: 0 6px 10px #00000055;
+    }
+    .duck-beak::before {
+      content: "";
+      position: absolute;
+      inset: 52% 10% 8% 10%;
+      border-radius: 999px;
+      background: radial-gradient(circle at 50% 0, #f97316, #9a3412);
+    }
+    .duck-sparkle {
+      position: absolute;
+      width: 10%;
+      height: 10%;
+      border-radius: 999px;
+      background: radial-gradient(circle, #fef9c3, #facc15, transparent);
+      top: 18%;
+      right: 18%;
+      opacity: 0.9;
+      filter: blur(1px);
+    }
+    .duck-aura {
+      position: absolute;
+      inset: -10%;
+      border-radius: 999px;
+      background: radial-gradient(circle, #facc1522, transparent 60%);
+      pointer-events: none;
+    }
+    .duck-caption {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 4px;
+    }
+    .stats-row {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .stats-row span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #020617aa;
+      border: 1px solid #1f2937;
+    }
+    .floating-number {
+      position: absolute;
+      pointer-events: none;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fef9c3;
+      text-shadow: 0 0 6px #000;
+      animation: floatUp 0.8s ease-out forwards;
+      z-index: 20;
+    }
+    @keyframes floatUp {
+      from { transform: translateY(0); opacity: 1; }
+      to { transform: translateY(-40px); opacity: 0; }
+    }
+    .feather {
+      position: absolute;
+      width: 14px;
+      height: 28px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #e5e7eb, #9ca3af);
+      opacity: 0.8;
+      transform-origin: top center;
+      animation: featherFall 2.4s linear forwards;
+      pointer-events: none;
+      filter: drop-shadow(0 0 4px #000000aa);
+      z-index: 5;
+    }
+    @keyframes featherFall {
+      0% { transform: translateY(-40px) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      100% { transform: translateY(220px) rotate(160deg); opacity: 0; }
+    }
+    .rainbow {
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 180deg,
+        #f97316,
+        #facc15,
+        #22c55e,
+        #22d3ee,
+        #6366f1,
+        #a855f7,
+        #f97316
+      );
+      opacity: 0.18;
+      filter: blur(4px);
+      pointer-events: none;
+      animation: rainbowPulse 2.2s ease-in-out infinite;
+    }
+    @keyframes rainbowPulse {
+      0%, 100% { transform: scale(0.9); opacity: 0.12; }
+      50% { transform: scale(1.1); opacity: 0.24; }
+    }
+    .generator {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 8px;
+      margin-bottom: 4px;
+      border-radius: 10px;
+      background: #020617dd;
+      border: 1px solid #111827;
+      box-shadow: 0 0 10px #00000066;
+      gap: 6px;
+    }
+    .generator-main {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      min-width: 0;
+    }
+    .generator-title {
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .generator-title span.icon {
+      font-size: 16px;
+    }
+    .generator-sub {
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .generator-sub span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .generator-count {
+      font-size: 12px;
+      color: var(--accent-soft);
+      font-weight: 600;
+    }
+    .generator button {
+      font-size: 11px;
+      padding: 4px 8px;
+    }
+    .generator button.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      filter: grayscale(0.4);
+    }
+    .upgrade {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 6px 8px;
+      margin-bottom: 4px;
+      border-radius: 10px;
+      background: #020617dd;
+      border: 1px solid #111827;
+      box-shadow: 0 0 10px #00000066;
+      font-size: 12px;
+    }
+    .upgrade-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+    .upgrade-name {
+      font-weight: 600;
+      color: var(--accent-soft);
+    }
+    .upgrade-desc {
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .upgrade-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      margin-top: 2px;
+      color: var(--muted);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border: 1px solid #1f2937;
+      background: #020617;
+    }
+    .badge-golden {
+      border-color: #facc15aa;
+      color: #facc15;
+    }
+    .badge-feather {
+      border-color: #38bdf8aa;
+      color: #38bdf8;
+    }
+    .badge-egg {
+      border-color: #a855f7aa;
+      color: #a855f7;
+    }
+    .badge-event {
+      border-color: #22c55eaa;
+      color: #22c55e;
+    }
+    .badge-prestige {
+      border-color: #f97373aa;
+      color: #fecaca;
+    }
+    .achievements-list {
+      font-size: 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .achievement {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 6px;
+      border-radius: 8px;
+      background: #020617dd;
+      border: 1px solid #111827;
+    }
+    .achievement span.name {
+      font-weight: 500;
+    }
+    .achievement span.desc {
+      color: var(--muted);
+      font-size: 10px;
+    }
+    .event-banner {
+      margin-bottom: 4px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: linear-gradient(90deg, #0f172a, #022c22);
+      border: 1px solid #16a34a;
+      font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+    .event-banner strong {
+      color: #bbf7d0;
+    }
+    .event-banner small {
+      color: #a7f3d0;
+    }
+    .toast {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #020617ee;
+      border: 1px solid #1f2937;
+      box-shadow: 0 0 18px #000000aa;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 50;
+      pointer-events: none;
+    }
+    .toast span.icon {
+      font-size: 16px;
+    }
+    .prestige-info {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .prestige-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #fecaca;
+    }
+    .dim-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at bottom, #22c55e11, transparent 60%);
+      mix-blend-mode: screen;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="main-clicker">
-            <div>
-                <h1>🦆 Dirty Duck Clicker 🦆</h1>
-                <div class="subtitle">Click Your Way to Duck Riches!</div>
-            </div>
-            <div class="duck-counter-wrapper">
-                <div class="duck-counter-label">Total Ducks Collected</div>
-                <div class="duck-counter">
-                    <span class="number" id="duckCount">0</span>
-                </div>
-            </div>
-            <button class="duck-button" id="duckButton">🦆</button>
-            <div class="stats">
-                <div class="stat-item">
-                    💥 Per Click
-                    <span id="clickValue">1</span>
-                </div>
-                <div class="stat-item">
-                    ⚡ Per Second
-                    <span id="perSecond">0</span>
-                </div>
-            </div>
+<div class="app">
+  <div class="top-bar">
+    <div class="top-resources">
+      <div class="pill">
+        <span class="icon">🦆</span>
+        <div>
+          <strong id="ducksDisplay">0</strong>
+          <small>Ducks</small>
         </div>
-
-        <div class="sidebar">
-            <div class="section">
-                <h2>🏗️ Buildings</h2>
-                <div class="buildings" id="buildingsContainer"></div>
-            </div>
-
-            <div class="section">
-                <h2>⭐ Upgrades</h2>
-                <div class="upgrades" id="upgradesContainer"></div>
-            </div>
-
-            <button class="reset-button" id="resetButton">🔄 Reset Game</button>
+      </div>
+      <div class="pill">
+        <span class="icon">✨</span>
+        <div>
+          <strong id="goldenDucksDisplay">0</strong>
+          <small>Golden Ducks</small>
         </div>
+      </div>
+      <div class="pill">
+        <span class="icon">🪶</span>
+        <div>
+          <strong id="featherCoinsDisplay">0</strong>
+          <small>Feather Coins</small>
+        </div>
+      </div>
+      <div class="pill">
+        <span class="icon">🥚</span>
+        <div>
+          <strong id="eggEnergyDisplay">0</strong>
+          <small>Egg Energy</small>
+        </div>
+      </div>
+      <div class="pill">
+        <span class="icon">⚡</span>
+        <div>
+          <strong id="dpsDisplay">0/s</strong>
+          <small>Duck Production</small>
+        </div>
+      </div>
+    </div>
+    <div class="top-right">
+      <button class="btn" id="saveBtn">💾 Save</button>
+      <button class="btn" id="loadBtn">📂 Load</button>
+      <button class="btn btn-danger" id="prestigeBtn" title="Reset for Feather Coins">🔥 Prestige</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <!-- LEFT: Generators -->
+    <div class="panel">
+      <div class="panel-header">
+        <span><strong>Generators</strong> • Idle Ducks</span>
+        <span>Tiered pond empire</span>
+      </div>
+      <div class="panel-body scroll" id="generatorsList"></div>
     </div>
 
-    <script>
-        var gameState = {
-            ducks: 0,
-            clickValue: 1,
-            perSecond: 0,
-            buildings: [
-                { id: 'bill', name: '🦆 Bill Duck', baseCost: 10, amount: 0, duckPerSecond: 0.1 },
-                { id: 'family', name: '👨‍👩‍👧‍👦 Duck Family', baseCost: 100, amount: 0, duckPerSecond: 1 },
-                { id: 'farm', name: '🌾 Duck Farm', baseCost: 500, amount: 0, duckPerSecond: 5 },
-                { id: 'pond', name: '🏞️ Mud Pond', baseCost: 2000, amount: 0, duckPerSecond: 20 },
-                { id: 'factory', name: '🏭 Duck Factory', baseCost: 10000, amount: 0, duckPerSecond: 100 }
-            ],
-            upgrades: [
-                { id: 'better-click', name: '⚡ Stronger Click', cost: 50, effect: 'Double click value', applied: false },
-                { id: 'lucky-duck', name: '🍀 Lucky Duck', cost: 150, effect: '+0.2 ducks/sec', applied: false },
-                { id: 'duckling-boost', name: '👶 Duckling Boost', cost: 300, effect: '+50% to buildings', applied: false, multiplier: 0.5 },
-                { id: 'mega-click', name: '💥 Mega Click', cost: 1000, effect: 'Triple click value', applied: false },
-                { id: 'golden-duck', name: '🏆 Golden Duck', cost: 5000, effect: 'All buildings +100%', applied: false, multiplier: 1 }
-            ]
-        };
+    <!-- CENTER: Duck clicker -->
+    <div class="panel center-panel">
+      <div class="dim-bg"></div>
+      <div class="duck-orbit"></div>
+      <div class="center-inner">
+        <div class="stats-row">
+          <span>Clicks: <strong id="clicksDisplay">0</strong></span>
+          <span>Combo: <strong id="comboDisplay">1.0x</strong></span>
+          <span>Crit: <strong id="critDisplay">5%</strong></span>
+        </div>
+        <div style="position:relative;display:flex;align-items:center;justify-content:center;">
+          <div class="rainbow" id="frenzyAura" style="opacity:0;pointer-events:none;"></div>
+          <button class="duck-button" id="duckButton">
+            <div class="duck-aura"></div>
+            <div class="duck-face">
+              <div class="duck-eye left"></div>
+              <div class="duck-eye right"></div>
+              <div class="duck-beak"></div>
+              <div class="duck-sparkle"></div>
+            </div>
+          </button>
+        </div>
+        <div class="duck-caption" id="duckCaption">
+          “A humble duck with universe-destroying potential.”
+        </div>
+        <div class="stats-row" style="margin-top:4px;">
+          <span>Lifetime Ducks: <strong id="lifetimeDisplay">0</strong></span>
+          <span>Prestige: <strong id="prestigeDisplay">Duckling</strong></span>
+        </div>
+      </div>
+      <div id="floatingLayer"></div>
+    </div>
 
-        var elements = {
-            duckCount: document.getElementById('duckCount'),
-            clickValue: document.getElementById('clickValue'),
-            perSecond: document.getElementById('perSecond'),
-            duckButton: document.getElementById('duckButton'),
-            buildingsContainer: document.getElementById('buildingsContainer'),
-            upgradesContainer: document.getElementById('upgradesContainer'),
-            resetButton: document.getElementById('resetButton')
-        };
+    <!-- RIGHT: Upgrades / Events / Achievements -->
+    <div class="panel">
+      <div class="panel-header">
+        <span><strong>Upgrades & Chaos</strong></span>
+        <span>Make ducks weird</span>
+      </div>
+      <div class="panel-body scroll">
+        <div id="eventsContainer"></div>
+        <div style="margin-bottom:6px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+            <span style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;">Upgrades</span>
+            <span style="font-size:11px;color:var(--muted);" id="upgradesCount"></span>
+          </div>
+          <div id="upgradesList"></div>
+        </div>
+        <hr style="border:none;border-top:1px solid #111827;margin:6px 0;">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+            <span style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;">Achievements</span>
+            <span style="font-size:11px;color:var(--muted);" id="achievementsCount"></span>
+          </div>
+          <div class="achievements-list" id="achievementsList"></div>
+        </div>
+        <div class="prestige-info">
+          <div class="prestige-title" id="prestigeTitle">Prestige: Duckling</div>
+          <div id="prestigeHint">Generate more ducks to unlock Feather Coins on reset.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-        function init() {
-            loadGame();
-            renderBuildings();
-            renderUpgrades();
-            updateDisplay();
-            
-            elements.duckButton.addEventListener('click', onDuckClick);
-            elements.resetButton.addEventListener('click', resetGame);
-            
-            setInterval(generatePerSecond, 1000);
+<div class="toast" id="toast" style="display:none;">
+  <span class="icon" id="toastIcon">🦆</span>
+  <span id="toastText">Toast</span>
+</div>
+
+<script>
+  // --- Utility big number helpers (simple, not perfect but good enough) ---
+  function toBig(n) {
+    if (typeof n === "string") return BigInt(n);
+    if (typeof n === "number") return BigInt(Math.floor(n));
+    if (typeof n === "bigint") return n;
+    return BigInt(0);
+  }
+  function bigAdd(a, b) {
+    return toBig(a) + toBig(b);
+  }
+  function bigMul(a, b) {
+    return toBig(a) * toBig(b);
+  }
+  function bigDiv(a, b) {
+    return toBig(a) / toBig(b);
+  }
+  function bigCmp(a, b) {
+    const x = toBig(a), y = toBig(b);
+    if (x === y) return 0;
+    return x > y ? 1 : -1;
+  }
+  function bigToNumber(b) {
+    const x = toBig(b);
+    const max = BigInt(Number.MAX_SAFE_INTEGER);
+    if (x > max) return Number.MAX_SAFE_INTEGER;
+    return Number(x);
+  }
+  function formatNumber(num) {
+    const n = typeof num === "bigint" ? bigToNumber(num) : num;
+    if (!isFinite(n)) return "∞";
+    if (n < 1000) return n.toString();
+    const units = ["K","M","B","T","Qa","Qi","Sx","Sp","Oc","No","Dc"];
+    let value = n;
+    let unitIndex = -1;
+    while (value >= 1000 && unitIndex < units.length - 1) {
+      value /= 1000;
+      unitIndex++;
+    }
+    if (unitIndex === -1) return n.toString();
+    if (unitIndex === units.length - 1 && value >= 1000) {
+      const exp = Math.floor(Math.log10(n));
+      const mant = n / Math.pow(10, exp);
+      return mant.toFixed(2) + "e" + exp;
+    }
+    return value.toFixed(2) + units[unitIndex];
+  }
+
+  // --- Game state ---
+  const game = {
+    ducks: BigInt(0),
+    goldenDucks: BigInt(0),
+    featherCoins: BigInt(0),
+    eggEnergy: BigInt(0),
+    lifetimeDucks: BigInt(0),
+    clicks: 0,
+    baseClick: 1,
+    clickMult: 1,
+    critChance: 0.05,
+    critMult: 5,
+    combo: 1,
+    comboTimer: 0,
+    comboMax: 5,
+    frenzy: false,
+    frenzyTimer: 0,
+    generators: [],
+    upgradesOwned: new Set(),
+    achievementsUnlocked: new Set(),
+    prestigeLevel: 0,
+    lastTick: performance.now(),
+    lastSave: Date.now(),
+    event: null,
+    eventTimer: 0,
+    eventCooldown: 0,
+  };
+
+  const prestigeTitles = [
+    "Duckling",
+    "Duck Master",
+    "Pond Emperor",
+    "Supreme Quacker",
+    "Duck God",
+    "Multiversal Duck Entity"
+  ];
+
+  const generatorsDef = [
+    {
+      id: "tiny_pond",
+      name: "Tiny Pond",
+      icon: "💧",
+      baseCost: 15,
+      growth: 1.15,
+      baseDps: 0.1,
+      desc: "A humble puddle with big dreams."
+    },
+    {
+      id: "duck_nest",
+      name: "Duck Nest",
+      icon: "🥚",
+      baseCost: 100,
+      growth: 1.16,
+      baseDps: 1,
+      desc: "Somewhere to put all these eggs."
+    },
+    {
+      id: "farmer_ducks",
+      name: "Farmer Ducks",
+      icon: "👨‍🌾",
+      baseCost: 500,
+      growth: 1.17,
+      baseDps: 5,
+      desc: "They grow ducks like crops."
+    },
+    {
+      id: "bread_factory",
+      name: "Bread Factory",
+      icon: "🍞",
+      baseCost: 2000,
+      growth: 1.18,
+      baseDps: 20,
+      desc: "Industrial-scale duck bribery."
+    },
+    {
+      id: "rubber_duck_machine",
+      name: "Rubber Duck Machine",
+      icon: "🛁",
+      baseCost: 8000,
+      growth: 1.19,
+      baseDps: 80,
+      desc: "Rubber ducks attract real ducks. Somehow."
+    },
+    {
+      id: "quack_farm",
+      name: "Quack Farm",
+      icon: "📢",
+      baseCost: 30000,
+      growth: 1.2,
+      baseDps: 300,
+      desc: "Amplified quacks echo across the land."
+    },
+    {
+      id: "duck_university",
+      name: "Duck University",
+      icon: "🎓",
+      baseCost: 150000,
+      growth: 1.21,
+      baseDps: 1500,
+      desc: "Higher quackucation."
+    },
+    {
+      id: "duck_city",
+      name: "Duck City",
+      icon: "🏙️",
+      baseCost: 800000,
+      growth: 1.22,
+      baseDps: 8000,
+      desc: "Urban duck sprawl."
+    },
+    {
+      id: "duck_cloning_lab",
+      name: "Duck Cloning Lab",
+      icon: "🧪",
+      baseCost: 4000000,
+      growth: 1.23,
+      baseDps: 40000,
+      desc: "Ethically questionable. Duck-effective."
+    },
+    {
+      id: "quantum_ducks",
+      name: "Quantum Ducks",
+      icon: "⚛️",
+      baseCost: 20000000,
+      growth: 1.24,
+      baseDps: 200000,
+      desc: "They exist in all ponds at once."
+    }
+  ];
+
+  const upgradesDef = [
+    {
+      id: "bigger_beaks",
+      name: "Bigger Beaks",
+      desc: "Click power x2. Ducks bite reality harder.",
+      cost: 100,
+      currency: "ducks",
+      effect: (g) => { g.clickMult *= 2; },
+      requirement: () => true
+    },
+    {
+      id: "faster_quacking",
+      name: "Faster Quacking",
+      desc: "Global production x1.5. Ducks talk faster than physics.",
+      cost: 1000,
+      currency: "ducks",
+      effect: (g) => { g.globalDpsMult = (g.globalDpsMult || 1) * 1.5; },
+      requirement: () => totalGeneratorCount() >= 5
+    },
+    {
+      id: "golden_bread",
+      name: "Golden Bread",
+      desc: "Bread Factories x3. Ducks will do anything for shiny carbs.",
+      cost: 5,
+      currency: "goldenDucks",
+      effect: (g) => { g.generatorMult = g.generatorMult || {}; g.generatorMult["bread_factory"] = (g.generatorMult["bread_factory"] || 1) * 3; },
+      requirement: () => getGenerator("bread_factory").count >= 5
+    },
+    {
+      id: "turbo_wings",
+      name: "Turbo Wings",
+      desc: "Crit chance +5%. Ducks break the sound barrier.",
+      cost: 5000,
+      currency: "ducks",
+      effect: (g) => { g.critChance += 0.05; },
+      requirement: () => g.clicks >= 200
+    },
+    {
+      id: "hyper_feathers",
+      name: "Hyper Feathers",
+      desc: "All generators x2. Feathers vibrate at unsafe frequencies.",
+      cost: 10,
+      currency: "featherCoins",
+      effect: (g) => { g.globalDpsMult = (g.globalDpsMult || 1) * 2; },
+      requirement: () => g.featherCoins > 0
+    },
+    {
+      id: "quantum_eggs",
+      name: "Quantum Eggs",
+      desc: "Unlock Egg Energy trickle. Scientists begged you not to.",
+      cost: 25,
+      currency: "featherCoins",
+      effect: (g) => { g.eggUnlocked = true; },
+      requirement: () => g.featherCoins >= 10
+    }
+  ];
+
+  const achievementsDef = [
+    {
+      id: "first_quack",
+      name: "First Quack",
+      desc: "Click the duck once.",
+      check: (g) => g.clicks >= 1
+    },
+    {
+      id: "duck_billionaire",
+      name: "Duck Billionaire",
+      desc: "Reach 1,000,000,000 ducks.",
+      check: (g) => bigCmp(g.ducks, BigInt(1_000_000_000)) >= 0
+    },
+    {
+      id: "too_many_ducks",
+      name: "Too Many Ducks",
+      desc: "Reach 100,000 ducks per second.",
+      check: (g) => computeDps() >= 100000
+    },
+    {
+      id: "the_duckening",
+      name: "The Duckening",
+      desc: "Perform your first prestige.",
+      check: (g) => g.prestigeLevel >= 1
+    },
+    {
+      id: "quackageddon",
+      name: "Quackageddon",
+      desc: "Trigger a Quack Apocalypse event.",
+      check: (g) => g.quackageddon || false
+    }
+  ];
+
+  const eventsDef = [
+    {
+      id: "bread_storm",
+      name: "Bread Storm",
+      icon: "🍞",
+      duration: 20,
+      desc: "Bread rains from the sky. Ducks go feral.",
+      start: (g) => { g.eventBreadMult = 2; showToast("🍞", "Bread Storm! Ducks are carb-loading."); },
+      end: (g) => { g.eventBreadMult = 1; }
+    },
+    {
+      id: "ufo_duck_invasion",
+      name: "UFO Duck Invasion",
+      icon: "🛸",
+      duration: 18,
+      desc: "Alien ducks abduct your productivity (and then boost it).",
+      start: (g) => { g.eventDpsMult = 3; showToast("🛸", "UFO Duck Invasion! Production x3."); },
+      end: (g) => { g.eventDpsMult = 1; }
+    },
+    {
+      id: "quack_apocalypse",
+      name: "Quack Apocalypse",
+      icon: "☄️",
+      duration: 12,
+      desc: "Reality glitches under the weight of quacks.",
+      start: (g) => { g.eventDpsMult = 6; g.quackageddon = true; showToast("☄️", "Quack Apocalypse! Everything is ducks."); },
+      end: (g) => { g.eventDpsMult = 1; }
+    }
+  ];
+
+  // --- DOM references ---
+  const ducksDisplay = document.getElementById("ducksDisplay");
+  const goldenDucksDisplay = document.getElementById("goldenDucksDisplay");
+  const featherCoinsDisplay = document.getElementById("featherCoinsDisplay");
+  const eggEnergyDisplay = document.getElementById("eggEnergyDisplay");
+  const dpsDisplay = document.getElementById("dpsDisplay");
+  const clicksDisplay = document.getElementById("clicksDisplay");
+  const comboDisplay = document.getElementById("comboDisplay");
+  const critDisplay = document.getElementById("critDisplay");
+  const lifetimeDisplay = document.getElementById("lifetimeDisplay");
+  const prestigeDisplay = document.getElementById("prestigeDisplay");
+  const prestigeTitleEl = document.getElementById("prestigeTitle");
+  const prestigeHint = document.getElementById("prestigeHint");
+  const generatorsList = document.getElementById("generatorsList");
+  const upgradesList = document.getElementById("upgradesList");
+  const upgradesCount = document.getElementById("upgradesCount");
+  const achievementsList = document.getElementById("achievementsList");
+  const achievementsCount = document.getElementById("achievementsCount");
+  const eventsContainer = document.getElementById("eventsContainer");
+  const duckButton = document.getElementById("duckButton");
+  const duckCaption = document.getElementById("duckCaption");
+  const floatingLayer = document.getElementById("floatingLayer");
+  const frenzyAura = document.getElementById("frenzyAura");
+  const toast = document.getElementById("toast");
+  const toastIcon = document.getElementById("toastIcon");
+  const toastText = document.getElementById("toastText");
+  const saveBtn = document.getElementById("saveBtn");
+  const loadBtn = document.getElementById("loadBtn");
+  const prestigeBtn = document.getElementById("prestigeBtn");
+
+  // --- Init generators ---
+  generatorsDef.forEach(def => {
+    game.generators.push({
+      id: def.id,
+      count: 0,
+      mult: 1
+    });
+  });
+
+  // --- Helpers ---
+  function getGenerator(id) {
+    return game.generators.find(g => g.id === id) || { id, count: 0, mult: 1 };
+  }
+  function totalGeneratorCount() {
+    return game.generators.reduce((sum, g) => sum + g.count, 0);
+  }
+  function computeGeneratorCost(def, count) {
+    return def.baseCost * Math.pow(def.growth, count);
+  }
+  function computeDps() {
+    let dps = 0;
+    for (const def of generatorsDef) {
+      const g = getGenerator(def.id);
+      const base = def.baseDps * g.count * g.mult;
+      dps += base;
+    }
+    const globalMult = game.globalDpsMult || 1;
+    const eventMult = game.eventDpsMult || 1;
+    const breadMult = game.eventBreadMult || 1;
+    return dps * globalMult * eventMult * breadMult;
+  }
+  function computePrestigeGain() {
+    const lifetime = bigToNumber(game.lifetimeDucks);
+    if (lifetime < 1e6) return 0;
+    return Math.floor(Math.cbrt(lifetime / 1e6));
+  }
+
+  function showToast(icon, text) {
+    toastIcon.textContent = icon;
+    toastText.textContent = text;
+    toast.style.display = "inline-flex";
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(() => {
+      toast.style.display = "none";
+    }, 2500);
+  }
+
+  function spawnFloatingNumber(text, color) {
+    const rect = duckButton.getBoundingClientRect();
+    const el = document.createElement("div");
+    el.className = "floating-number";
+    el.textContent = text;
+    el.style.left = (rect.left + rect.width / 2 + (Math.random() * 40 - 20)) + "px";
+    el.style.top = (rect.top + rect.height / 2 + (Math.random() * 20 - 10)) + "px";
+    el.style.color = color || "#fef9c3";
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 800);
+  }
+
+  function spawnFeather() {
+    const rect = duckButton.getBoundingClientRect();
+    const el = document.createElement("div");
+    el.className = "feather";
+    el.style.left = (rect.left + rect.width / 2 + (Math.random() * 80 - 40)) + "px";
+    el.style.top = (rect.top - 20 + Math.random() * 20) + "px";
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2400);
+  }
+
+  // --- Click handling ---
+  duckButton.addEventListener("mousedown", handleDuckClick);
+  duckButton.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    handleDuckClick();
+  }, { passive: false });
+
+  function handleDuckClick() {
+    game.clicks++;
+    const base = game.baseClick * game.clickMult * (game.frenzy ? 5 : 1);
+    const comboMult = 1 + (game.combo - 1) * 0.25;
+    const critRoll = Math.random();
+    const isCrit = critRoll < game.critChance;
+    const gain = base * comboMult * (isCrit ? game.critMult : 1);
+    const gainBig = BigInt(Math.floor(gain));
+    game.ducks = bigAdd(game.ducks, gainBig);
+    game.lifetimeDucks = bigAdd(game.lifetimeDucks, gainBig);
+
+    game.combo = Math.min(game.combo + 0.1, game.comboMax);
+    game.comboTimer = 1.2;
+
+    if (!game.frenzy && game.combo >= game.comboMax) {
+      game.frenzy = true;
+      game.frenzyTimer = 6;
+      frenzyAura.style.opacity = "0.35";
+      duckCaption.textContent = "Frenzy! The duck has seen beyond the pond.";
+      showToast("🌈", "Quack Frenzy! Clicks are supercharged.");
+    }
+
+    spawnFloatingNumber("+" + formatNumber(gainBig) + (isCrit ? "!!" : ""), isCrit ? "#f97316" : "#fef9c3");
+    if (Math.random() < 0.4) spawnFeather();
+
+    if (Math.random() < 0.02) {
+      const roll = Math.random();
+      if (roll < 0.4) {
+        const bonus = BigInt(Math.floor(base * 20));
+        game.ducks = bigAdd(game.ducks, bonus);
+        game.lifetimeDucks = bigAdd(game.lifetimeDucks, bonus);
+        showToast("🦆", "Bonus duck burst! +" + formatNumber(bonus) + " ducks.");
+      } else if (roll < 0.7) {
+        game.goldenDucks = bigAdd(game.goldenDucks, 1);
+        showToast("✨", "A Golden Duck appeared! +1 Golden Duck.");
+      } else {
+        game.combo = Math.min(game.combo + 1, game.comboMax);
+        showToast("💥", "Click streak boosted!");
+      }
+    }
+
+    updateUI();
+  }
+
+  // --- Generators UI ---
+  function renderGenerators() {
+    generatorsList.innerHTML = "";
+    for (const def of generatorsDef) {
+      const g = getGenerator(def.id);
+      const cost = computeGeneratorCost(def, g.count);
+      const canAfford = bigCmp(game.ducks, BigInt(Math.floor(cost))) >= 0;
+      const dps = def.baseDps * g.count * (game.generatorMult && game.generatorMult[def.id] || 1);
+      const el = document.createElement("div");
+      el.className = "generator";
+      const main = document.createElement("div");
+      main.className = "generator-main";
+      const title = document.createElement("div");
+      title.className = "generator-title";
+      const icon = document.createElement("span");
+      icon.className = "icon";
+      icon.textContent = def.icon;
+      const name = document.createElement("span");
+      name.textContent = def.name;
+      title.appendChild(icon);
+      title.appendChild(name);
+      const sub = document.createElement("div");
+      sub.className = "generator-sub";
+      const desc = document.createElement("span");
+      desc.textContent = def.desc;
+      const dpsSpan = document.createElement("span");
+      dpsSpan.textContent = formatNumber(dps) + "/s";
+      dpsSpan.style.color = "#a5b4fc";
+      sub.appendChild(desc);
+      sub.appendChild(dpsSpan);
+      main.appendChild(title);
+      main.appendChild(sub);
+      const right = document.createElement("div");
+      right.style.display = "flex";
+      right.style.flexDirection = "column";
+      right.style.alignItems = "flex-end";
+      right.style.gap = "2px";
+      const count = document.createElement("div");
+      count.className = "generator-count";
+      count.textContent = "x" + g.count;
+      const btn = document.createElement("button");
+      btn.className = "btn";
+      btn.textContent = "Buy (" + formatNumber(cost) + ")";
+      if (!canAfford) btn.classList.add("disabled");
+      btn.addEventListener("click", () => {
+        if (!canAfford) return;
+        game.ducks = bigAdd(game.ducks, -BigInt(Math.floor(cost)));
+        g.count++;
+        showToast(def.icon, "Bought " + def.name + "!");
+        renderGenerators();
+        updateUI();
+      });
+      right.appendChild(count);
+      right.appendChild(btn);
+      el.appendChild(main);
+      el.appendChild(right);
+      generatorsList.appendChild(el);
+    }
+  }
+
+  // --- Upgrades UI ---
+  function renderUpgrades() {
+    upgradesList.innerHTML = "";
+    let available = 0;
+    for (const up of upgradesDef) {
+      if (game.upgradesOwned.has(up.id)) continue;
+      if (!up.requirement(game)) continue;
+      available++;
+      const el = document.createElement("div");
+      el.className = "upgrade";
+      const header = document.createElement("div");
+      header.className = "upgrade-header";
+      const name = document.createElement("div");
+      name.className = "upgrade-name";
+      name.textContent = up.name;
+      const badge = document.createElement("div");
+      badge.className = "badge";
+      if (up.currency === "goldenDucks") badge.classList.add("badge-golden");
+      if (up.currency === "featherCoins") badge.classList.add("badge-feather");
+      if (up.currency === "eggEnergy") badge.classList.add("badge-egg");
+      badge.textContent = up.currency === "ducks" ? "Ducks" :
+                          up.currency === "goldenDucks" ? "Golden" :
+                          up.currency === "featherCoins" ? "Feathers" : "Eggs";
+      header.appendChild(name);
+      header.appendChild(badge);
+      const desc = document.createElement("div");
+      desc.className = "upgrade-desc";
+      desc.textContent = up.desc;
+      const meta = document.createElement("div");
+      meta.className = "upgrade-meta";
+      const cost = document.createElement("span");
+      cost.textContent = "Cost: " + formatNumber(up.cost);
+      const btn = document.createElement("button");
+      btn.className = "btn";
+      btn.style.fontSize = "10px";
+      btn.textContent = "Purchase";
+      let canAfford = false;
+      if (up.currency === "ducks") canAfford = bigCmp(game.ducks, BigInt(up.cost)) >= 0;
+      if (up.currency === "goldenDucks") canAfford = bigCmp(game.goldenDucks, BigInt(up.cost)) >= 0;
+      if (up.currency === "featherCoins") canAfford = bigCmp(game.featherCoins, BigInt(up.cost)) >= 0;
+      if (up.currency === "eggEnergy") canAfford = bigCmp(game.eggEnergy, BigInt(up.cost)) >= 0;
+      if (!canAfford) btn.classList.add("disabled");
+      btn.addEventListener("click", () => {
+        if (!canAfford) return;
+        if (up.currency === "ducks") game.ducks = bigAdd(game.ducks, -BigInt(up.cost));
+        if (up.currency === "goldenDucks") game.goldenDucks = bigAdd(game.goldenDucks, -BigInt(up.cost));
+        if (up.currency === "featherCoins") game.featherCoins = bigAdd(game.featherCoins, -BigInt(up.cost));
+        if (up.currency === "eggEnergy") game.eggEnergy = bigAdd(game.eggEnergy, -BigInt(up.cost));
+        up.effect(game);
+        game.upgradesOwned.add(up.id);
+        showToast("⬆️", "Upgrade purchased: " + up.name);
+        renderUpgrades();
+        updateUI();
+      });
+      meta.appendChild(cost);
+      meta.appendChild(btn);
+      el.appendChild(header);
+      el.appendChild(desc);
+      el.appendChild(meta);
+      upgradesList.appendChild(el);
+    }
+    upgradesCount.textContent = available + " available";
+  }
+
+  // --- Achievements UI ---
+  function renderAchievements() {
+    achievementsList.innerHTML = "";
+    let unlocked = 0;
+    for (const a of achievementsDef) {
+      const has = game.achievementsUnlocked.has(a.id);
+      if (has) unlocked++;
+      const el = document.createElement("div");
+      el.className = "achievement";
+      const left = document.createElement("div");
+      const name = document.createElement("span");
+      name.className = "name";
+      name.textContent = a.name;
+      const desc = document.createElement("div");
+      desc.className = "desc";
+      desc.textContent = a.desc;
+      left.appendChild(name);
+      left.appendChild(desc);
+      const right = document.createElement("div");
+      right.className = "badge";
+      if (has) {
+        right.classList.add("badge-event");
+        right.textContent = "Unlocked";
+      } else {
+        right.textContent = "Hidden";
+        right.style.opacity = "0.4";
+      }
+      el.appendChild(left);
+      el.appendChild(right);
+      achievementsList.appendChild(el);
+    }
+    achievementsCount.textContent = unlocked + "/" + achievementsDef.length;
+  }
+
+  function checkAchievements() {
+    for (const a of achievementsDef) {
+      if (game.achievementsUnlocked.has(a.id)) continue;
+      if (a.check(game)) {
+        game.achievementsUnlocked.add(a.id);
+        showToast("🏆", "Achievement unlocked: " + a.name);
+      }
+    }
+    renderAchievements();
+  }
+
+  // --- Events ---
+  function maybeStartEvent(dt) {
+    if (game.event || game.eventCooldown > 0) {
+      game.eventCooldown = Math.max(0, game.eventCooldown - dt);
+      return;
+    }
+    if (Math.random() < 0.002) {
+      const ev = eventsDef[Math.floor(Math.random() * eventsDef.length)];
+      game.event = { def: ev, timeLeft: ev.duration };
+      game.eventTimer = ev.duration;
+      game.eventCooldown = 60;
+      ev.start(game);
+      renderEvents();
+    }
+  }
+
+  function updateEvent(dt) {
+    if (!game.event) return;
+    game.event.timeLeft -= dt;
+    if (game.event.timeLeft <= 0) {
+      game.event.def.end(game);
+      game.event = null;
+      renderEvents();
+    } else {
+      renderEvents();
+    }
+  }
+
+  function renderEvents() {
+    eventsContainer.innerHTML = "";
+    if (!game.event) return;
+    const ev = game.event.def;
+    const el = document.createElement("div");
+    el.className = "event-banner";
+    const left = document.createElement("div");
+    left.innerHTML = `<strong>${ev.icon} ${ev.name}</strong><br><small>${ev.desc}</small>`;
+    const right = document.createElement("div");
+    right.className = "badge badge-event";
+    right.textContent = game.event.timeLeft.toFixed(1) + "s";
+    el.appendChild(left);
+    el.appendChild(right);
+    eventsContainer.appendChild(el);
+  }
+
+  // --- Prestige ---
+  prestigeBtn.addEventListener("click", () => {
+    const gain = computePrestigeGain();
+    if (gain <= 0) {
+      showToast("❌", "Not enough ducks to prestige yet.");
+      return;
+    }
+    if (!confirm(`Prestige and reset for +${gain} Feather Coins?`)) return;
+    game.featherCoins = bigAdd(game.featherCoins, BigInt(gain));
+    game.prestigeLevel++;
+    game.ducks = BigInt(0);
+    game.goldenDucks = BigInt(0);
+    game.eggEnergy = BigInt(0);
+    game.lifetimeDucks = BigInt(0);
+    game.clicks = 0;
+    game.baseClick = 1;
+    game.clickMult = 1;
+    game.critChance = 0.05;
+    game.critMult = 5;
+    game.combo = 1;
+    game.comboTimer = 0;
+    game.frenzy = false;
+    game.frenzyTimer = 0;
+    game.globalDpsMult = 1;
+    game.eventDpsMult = 1;
+    game.eventBreadMult = 1;
+    game.generatorMult = {};
+    game.quackageddon = game.quackageddon || false;
+    game.generators.forEach(g => { g.count = 0; g.mult = 1; });
+    showToast("🔥", "Prestige! You ascended your pond.");
+    renderGenerators();
+    renderUpgrades();
+    updateUI();
+    checkAchievements();
+  });
+
+  // --- Save / Load ---
+  function saveGame() {
+    const data = {
+      ducks: game.ducks.toString(),
+      goldenDucks: game.goldenDucks.toString(),
+      featherCoins: game.featherCoins.toString(),
+      eggEnergy: game.eggEnergy.toString(),
+      lifetimeDucks: game.lifetimeDucks.toString(),
+      clicks: game.clicks,
+      baseClick: game.baseClick,
+      clickMult: game.clickMult,
+      critChance: game.critChance,
+      critMult: game.critMult,
+      comboMax: game.comboMax,
+      frenzyUnlocked: true,
+      generators: game.generators,
+      upgradesOwned: Array.from(game.upgradesOwned),
+      achievementsUnlocked: Array.from(game.achievementsUnlocked),
+      prestigeLevel: game.prestigeLevel,
+      globalDpsMult: game.globalDpsMult || 1,
+      eventDpsMult: game.eventDpsMult || 1,
+      eventBreadMult: game.eventBreadMult || 1,
+      generatorMult: game.generatorMult || {},
+      eggUnlocked: game.eggUnlocked || false,
+      quackageddon: game.quackageddon || false,
+      lastSave: Date.now()
+    };
+    localStorage.setItem("duck_clicker_save", JSON.stringify(data));
+    game.lastSave = Date.now();
+    showToast("💾", "Game saved.");
+  }
+
+  function loadGame() {
+    const raw = localStorage.getItem("duck_clicker_save");
+    if (!raw) {
+      showToast("❔", "No save found.");
+      return;
+    }
+    try {
+      const data = JSON.parse(raw);
+      game.ducks = BigInt(data.ducks || "0");
+      game.goldenDucks = BigInt(data.goldenDucks || "0");
+      game.featherCoins = BigInt(data.featherCoins || "0");
+      game.eggEnergy = BigInt(data.eggEnergy || "0");
+      game.lifetimeDucks = BigInt(data.lifetimeDucks || "0");
+      game.clicks = data.clicks || 0;
+      game.baseClick = data.baseClick || 1;
+      game.clickMult = data.clickMult || 1;
+      game.critChance = data.critChance || 0.05;
+      game.critMult = data.critMult || 5;
+      game.comboMax = data.comboMax || 5;
+      game.globalDpsMult = data.globalDpsMult || 1;
+      game.eventDpsMult = data.eventDpsMult || 1;
+      game.eventBreadMult = data.eventBreadMult || 1;
+      game.generatorMult = data.generatorMult || {};
+      game.eggUnlocked = data.eggUnlocked || false;
+      game.quackageddon = data.quackageddon || false;
+      game.prestigeLevel = data.prestigeLevel || 0;
+      game.upgradesOwned = new Set(data.upgradesOwned || []);
+      game.achievementsUnlocked = new Set(data.achievementsUnlocked || []);
+      game.generators.forEach(g => {
+        const saved = (data.generators || []).find(x => x.id === g.id);
+        if (saved) {
+          g.count = saved.count || 0;
+          g.mult = saved.mult || 1;
         }
+      });
+      game.lastSave = data.lastSave || Date.now();
+      const offlineSeconds = Math.min((Date.now() - game.lastSave) / 1000, 3600);
+      const dps = computeDps();
+      const offlineGain = BigInt(Math.floor(dps * offlineSeconds));
+      if (offlineGain > 0) {
+        game.ducks = bigAdd(game.ducks, offlineGain);
+        game.lifetimeDucks = bigAdd(game.lifetimeDucks, offlineGain);
+        showToast("⏱️", `While you were gone, ducks made +${formatNumber(offlineGain)} ducks.`);
+      }
+      renderGenerators();
+      renderUpgrades();
+      renderAchievements();
+      updateUI();
+    } catch (e) {
+      console.error(e);
+      showToast("⚠️", "Failed to load save.");
+    }
+  }
 
-        function onDuckClick() {
-            gameState.ducks += gameState.clickValue;
-            createFloatie(gameState.clickValue);
-            updateDisplay();
-            saveGame();
-        }
+  saveBtn.addEventListener("click", saveGame);
+  loadBtn.addEventListener("click", loadGame);
 
-        function createFloatie(amount) {
-            var floatie = document.createElement('div');
-            floatie.className = 'floatie';
-            floatie.textContent = '+' + Math.floor(amount);
-            floatie.style.color = '#667eea';
-            floatie.style.left = Math.random() * 100 + '%';
-            floatie.style.top = Math.random() * 50 + '%';
-            elements.duckButton.appendChild(floatie);
-            
-            setTimeout(function() { floatie.remove(); }, 1200);
-        }
+  // --- UI update ---
+  function updateUI() {
+    ducksDisplay.textContent = formatNumber(game.ducks);
+    goldenDucksDisplay.textContent = formatNumber(game.goldenDucks);
+    featherCoinsDisplay.textContent = formatNumber(game.featherCoins);
+    eggEnergyDisplay.textContent = formatNumber(game.eggEnergy);
+    const dps = computeDps();
+    dpsDisplay.textContent = formatNumber(dps) + "/s";
+    clicksDisplay.textContent = game.clicks;
+    comboDisplay.textContent = game.combo.toFixed(1) + "x";
+    critDisplay.textContent = Math.round(game.critChance * 100) + "%";
+    lifetimeDisplay.textContent = formatNumber(game.lifetimeDucks);
+    const title = prestigeTitles[Math.min(game.prestigeLevel, prestigeTitles.length - 1)];
+    prestigeDisplay.textContent = title;
+    prestigeTitleEl.textContent = "Prestige: " + title;
+    const gain = computePrestigeGain();
+    if (gain > 0) {
+      prestigeHint.textContent = `Prestige now for +${gain} Feather Coins.`;
+    } else {
+      prestigeHint.textContent = "Generate more ducks to unlock Feather Coins on reset.";
+    }
+    frenzyAura.style.opacity = game.frenzy ? "0.35" : "0";
+  }
 
-        function generatePerSecond() {
-            gameState.ducks += gameState.perSecond;
-            updateDisplay();
-            saveGame();
-        }
+  // --- Game loop ---
+  function tick() {
+    const now = performance.now();
+    const dt = (now - game.lastTick) / 1000;
+    game.lastTick = now;
 
-        function buyBuilding(id) {
-            var building = gameState.buildings.find(function(b) { return b.id === id; });
-            var cost = getBuildingCost(building);
-            
-            if (gameState.ducks >= cost) {
-                gameState.ducks -= cost;
-                building.amount++;
-                updatePerSecond();
-                renderBuildings();
-                updateDisplay();
-                saveGame();
-                showAchievement(building.name + ' purchased!');
-            }
-        }
+    const dps = computeDps();
+    const gain = BigInt(Math.floor(dps * dt));
+    if (gain > 0) {
+      game.ducks = bigAdd(game.ducks, gain);
+      game.lifetimeDucks = bigAdd(game.lifetimeDucks, gain);
+    }
 
-        function buyUpgrade(id) {
-            var upgrade = gameState.upgrades.find(function(u) { return u.id === id; });
-            
-            if (!upgrade.applied && gameState.ducks >= upgrade.cost) {
-                gameState.ducks -= upgrade.cost;
-                upgrade.applied = true;
-                
-                if (upgrade.id === 'better-click') {
-                    gameState.clickValue *= 2;
-                } else if (upgrade.id === 'lucky-duck') {
-                    gameState.perSecond += 0.2;
-                } else if (upgrade.id === 'mega-click') {
-                    gameState.clickValue *= 3;
-                }
-                
-                if (upgrade.multiplier !== undefined) {
-                    gameState.buildings.forEach(function(b) { 
-                        b.duckPerSecond *= (1 + upgrade.multiplier);
-                    });
-                    updatePerSecond();
-                }
-                
-                renderUpgrades();
-                updateDisplay();
-                saveGame();
-                showAchievement(upgrade.name + ' unlocked!');
-            }
-        }
+    if (game.comboTimer > 0) {
+      game.comboTimer -= dt;
+      if (game.comboTimer <= 0) {
+        game.combo = Math.max(1, game.combo - 0.2);
+        game.comboTimer = 0;
+      }
+    } else {
+      game.combo = Math.max(1, game.combo - dt * 0.2);
+    }
 
-        function getBuildingCost(building) {
-            return Math.floor(building.baseCost * Math.pow(1.15, building.amount));
-        }
+    if (game.frenzy) {
+      game.frenzyTimer -= dt;
+      if (game.frenzyTimer <= 0) {
+        game.frenzy = false;
+        duckCaption.textContent = "The duck is catching its breath.";
+      }
+    }
 
-        function updatePerSecond() {
-            gameState.perSecond = gameState.buildings.reduce(function(sum, b) { 
-                return sum + (b.amount * b.duckPerSecond);
-            }, 0);
-        }
+    if (game.eggUnlocked) {
+      const eggGain = dps * 0.00001 * dt;
+      if (eggGain > 0) {
+        game.eggEnergy = bigAdd(game.eggEnergy, BigInt(Math.floor(eggGain)));
+      }
+    }
 
-        function renderBuildings() {
-            elements.buildingsContainer.innerHTML = gameState.buildings.map(function(building) {
-                var cost = getBuildingCost(building);
-                var canAfford = gameState.ducks >= cost;
-                return '<div class="building-item ' + (!canAfford ? 'disabled' : '') + '" onclick="buyBuilding(\'' + building.id + '\')"><div class="item-name">' + building.name + '</div><div class="item-effect">+' + building.duckPerSecond.toFixed(1) + '/sec</div><div class="item-cost">Cost: ' + cost.toLocaleString() + ' | Owned: ' + building.amount + '</div></div>';
-            }).join('');
-        }
+    maybeStartEvent(dt);
+    updateEvent(dt);
+    checkAchievements();
+    renderUpgrades();
+    updateUI();
 
-        function renderUpgrades() {
-            elements.upgradesContainer.innerHTML = gameState.upgrades.map(function(upgrade) {
-                var canAfford = gameState.ducks >= upgrade.cost && !upgrade.applied;
-                return '<div class="upgrade-item ' + (!canAfford ? 'disabled' : '') + ' ' + (upgrade.applied ? 'applied' : '') + '" onclick="buyUpgrade(\'' + upgrade.id + '\')"><div class="item-name">' + upgrade.name + '</div><div class="item-effect">' + upgrade.effect + '</div><div class="item-cost">' + (upgrade.applied ? '✓ Purchased' : 'Cost: ' + upgrade.cost.toLocaleString()) + '</div></div>';
-            }).join('');
-        }
+    requestAnimationFrame(tick);
+  }
 
-        function updateDisplay() {
-            elements.duckCount.textContent = Math.floor(gameState.ducks).toLocaleString();
-            elements.clickValue.textContent = gameState.clickValue;
-            elements.perSecond.textContent = gameState.perSecond.toFixed(1);
-            renderBuildings();
-            renderUpgrades();
-        }
+  // --- Initial render ---
+  renderGenerators();
+  renderUpgrades();
+  renderAchievements();
+  updateUI();
+  requestAnimationFrame(tick);
 
-        function showAchievement(text) {
-            var badge = document.createElement('div');
-            badge.className = 'achievement-badge';
-            badge.textContent = text;
-            document.body.appendChild(badge);
-            
-            setTimeout(function() {
-                badge.style.animation = 'slideIn 0.5s ease-out reverse';
-                setTimeout(function() { badge.remove(); }, 500);
-            }, 2500);
-        }
-
-        function saveGame() {
-            localStorage.setItem('dirtyDuckSave', JSON.stringify(gameState));
-        }
-
-        function loadGame() {
-            var saved = localStorage.getItem('dirtyDuckSave');
-            if (saved) {
-                var loaded = JSON.parse(saved);
-                for (var key in loaded) {
-                    gameState[key] = loaded[key];
-                }
-                updatePerSecond();
-            }
-        }
-
-        function resetGame() {
-            if (confirm('Are you sure you want to reset your game? This cannot be undone!')) {
-                localStorage.removeItem('dirtyDuckSave');
-                location.reload();
-            }
-        }
-
-        init();
-    </script>
+  // Auto-save every 60s
+  setInterval(saveGame, 60000);
+</script>
 </body>
 </html>
